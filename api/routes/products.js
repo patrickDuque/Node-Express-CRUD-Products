@@ -1,6 +1,5 @@
 // Libraries
 const express = require('express');
-const mongoose = require('mongoose');
 
 // Schema
 const Product = require('../models/products');
@@ -9,7 +8,7 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {
-    const productList = await Product.find();
+    const productList = await Product.find().select('name price _id');
     res.status(200).json({ products: productList });
   } catch (error) {
     res.status(500).json({ error: { message: 'Something went wrong', error } });
@@ -19,8 +18,10 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { name, price } = req.body;
+    if (price <= 0) {
+      return res.json({ error: { message: 'Price cannot be 0' } });
+    }
     const product = new Product({
-      _id   : new mongoose.Types.ObjectId(),
       name  : name,
       price : +price
     });
@@ -34,7 +35,7 @@ router.post('/', async (req, res) => {
 router.get('/:productId', async (req, res) => {
   try {
     const id = req.params.productId;
-    const product = await Product.findById(id);
+    const product = await Product.findById(id).select('name _id price');
     if (product) {
       res.status(200).json({ result: product });
     } else {
@@ -59,6 +60,11 @@ router.put('/:productId', async (req, res) => {
   try {
     const id = req.params.productId;
     const { name, price } = req.body;
+    if (!name || name.length <= 0) {
+      return res.status(500).json({ error: { message: 'Name cannot be blank' } });
+    } else if (price <= 0 || !price) {
+      return res.status(500).json({ error: { message: 'Price cannot be blank' } });
+    }
     const editedProduct = await Product.update({ _id: id }, { $set: { name, price: +price } });
     res.status(201).json({ message: 'Edited Product' });
   } catch (error) {
