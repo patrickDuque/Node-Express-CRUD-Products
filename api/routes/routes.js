@@ -14,7 +14,7 @@ const authentication = require('../../helpers/authentication');
 // Auth
 router.post('/auth/signup', userController.signup);
 router.post('/auth/signin', userController.signin);
-router.delete('/auth/:userId', userController.deleteUser);
+router.delete('/auth/:userId', authentication, userController.deleteUser);
 
 // Orders
 router.get('/orders/', authentication, ordersController.getOrders);
