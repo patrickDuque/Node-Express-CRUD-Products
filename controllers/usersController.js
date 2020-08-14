@@ -41,7 +41,9 @@ exports.signin = async (req, res) => {
       if (err) {
         res.status(500).json({ error: { message: 'Error loggin in... Please try again', error: err.message } });
       } else if (result) {
-        res.status(200).json({ user: { email: user.email, _id: user._id, isAdmin: user.isAdmin } });
+        const { email, _id, isAdmin } = user;
+        const token = jwt.sign({ email: email, id: _id }, process.env.JWT_KEY, { expiresIn: 60 * 60 });
+        res.status(200).json({ user: { email, _id: _id, isAdmin, token, expiresIn: 3600 } });
       } else {
         res.status(400).json({ error: { message: 'Invalid credentials' } });
       }
