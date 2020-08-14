@@ -8,6 +8,7 @@ const productsController = require('../../controllers/productsController');
 
 // Helpers
 const upload = require('../../helpers/multer');
+const authentication = require('../../helpers/authentication');
 
 // Routes
 // Auth
@@ -16,17 +17,17 @@ router.post('/auth/signin', userController.signin);
 router.delete('/auth/:userId', userController.deleteUser);
 
 // Orders
-router.get('/orders/', ordersController.getOrders);
-router.post('/orders/', ordersController.postOrder);
-router.get('/orders/:orderId', ordersController.getOrderById);
-router.delete('/orders/:orderId', ordersController.deleteOrder);
-router.put('/orders/:orderId', ordersController.editOrder);
+router.get('/orders/', authentication, ordersController.getOrders);
+router.get('/orders/:orderId', authentication, ordersController.getOrderById);
+router.post('/orders/', authentication, ordersController.postOrder);
+router.delete('/orders/:orderId', authentication, ordersController.deleteOrder);
+router.put('/orders/:orderId', authentication, ordersController.editOrder);
 
 // Products
 router.get('/products/', productsController.getProducts);
-router.post('/products/', upload.single('productImage'), productsController.postProduct);
 router.get('/products/:productId', productsController.getProductById);
-router.delete('/products/:productId', productsController.deleteProduct);
-router.put('/products/:productId', productsController.editProduct);
+router.post('/products/', authentication, upload.single('productImage'), productsController.postProduct);
+router.delete('/products/:productId', authentication, productsController.deleteProduct);
+router.put('/products/:productId', authentication, productsController.editProduct);
 
 module.exports = router;
