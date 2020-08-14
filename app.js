@@ -24,12 +24,9 @@ mongoose
 // Middleware
 app.use(morgan('dev'));
 app.use(cors());
+app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.json());
-app.use(
-  bodyParser.urlencoded({
-    extended : false
-  })
-);
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // Routes
 app.use('/products', productsRoute);
