@@ -6,9 +6,8 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-// Routes import
-const productsRoute = require('./api/routes/products');
-const ordersRoute = require('./api/routes/orders');
+// Routes
+const routes = require('./api/routes/routes');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -29,8 +28,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // Routes
-app.use('/products', productsRoute);
-app.use('/orders', ordersRoute);
+app.use(routes);
 
 app.use((req, res, next) => {
   const error = new Error('Not found');

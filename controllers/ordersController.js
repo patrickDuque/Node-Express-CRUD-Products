@@ -1,21 +1,16 @@
-const express = require('express');
+const Product = require('../api/models/products');
+const Order = require('../api/models/orders');
 
-const Order = require('../models/orders');
-const Product = require('../models/products');
-const { findById } = require('../models/products');
-
-const router = express.Router();
-
-router.get('/', async (req, res) => {
+exports.getOrders = async (req, res) => {
   try {
     const orders = await Order.find().populate('product').select('product _id quantity productName');
     res.status(200).json({ orders });
   } catch (error) {
     res.status(500).json({ error: { message: 'Error fetching orders', error: error.message } });
   }
-});
+};
 
-router.post('/', async (req, res) => {
+exports.postOrder = async (req, res) => {
   try {
     const { productId, quantity } = req.body;
     const product = await Product.findById(productId);
@@ -32,9 +27,9 @@ router.post('/', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: { message: 'Error adding order', error: error.message } });
   }
-});
+};
 
-router.get('/:orderId', async (req, res) => {
+exports.getOrderById = async (req, res) => {
   try {
     const id = req.params.orderId;
     const order = await Order.findById(id).populate('product').select('product _id quantity');
@@ -46,9 +41,9 @@ router.get('/:orderId', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: { message: 'Error fetching order', error: error.message } });
   }
-});
+};
 
-router.delete('/:orderId', async (req, res) => {
+exports.deleteOrder = async (req, res) => {
   try {
     const id = req.params.orderId;
     const order = await Order.findByIdAndDelete(id);
@@ -56,9 +51,9 @@ router.delete('/:orderId', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: { message: 'Error deleting order', error: error.message } });
   }
-});
+};
 
-router.put('/:orderId', async (req, res) => {
+exports.editOrder = async (req, res) => {
   try {
     const id = req.params.orderId;
     const order = await Order.findByIdAndUpdate(id, { quantity: req.body.quantity });
@@ -66,6 +61,4 @@ router.put('/:orderId', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: { message: 'Error deleting order', error: error.message } });
   }
-});
-
-module.exports = router;
+};

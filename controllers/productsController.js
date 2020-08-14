@@ -1,39 +1,15 @@
-// Libraries
-const express = require('express');
-const multer = require('multer');
+const Product = require('../api/models/products');
 
-// Schema
-const Product = require('../models/products');
-
-const router = express.Router();
-const storage = multer.diskStorage({
-  destination : (req, file, cb) => {
-    cb(null, './uploads/');
-  },
-  filename    : (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + '-' + file.originalname);
-  }
-});
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg') {
-    cb(null, true);
-  } else {
-    cb(null, false);
-  }
-};
-const upload = multer({ storage, limits: { fileSize: 1024 * 1024 * 3 }, fileFilter });
-
-router.get('/', async (req, res) => {
+exports.getProducts = async (req, res) => {
   try {
     const productList = await Product.find().select('name price _id productImage');
     res.status(200).json({ products: productList });
   } catch (error) {
     res.status(500).json({ error: { message: 'Something went wrong', error } });
   }
-});
+};
 
-router.post('/', upload.single('productImage'), async (req, res) => {
+exports.postProduct = async (req, res) => {
   try {
     const { name, price } = req.body;
     if (!req.file) {
@@ -53,9 +29,9 @@ router.post('/', upload.single('productImage'), async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: { message: 'Error adding products', error: error.message } });
   }
-});
+};
 
-router.get('/:productId', async (req, res) => {
+exports.getProductById = async (req, res) => {
   try {
     const id = req.params.productId;
     const product = await Product.findById(id);
@@ -67,9 +43,9 @@ router.get('/:productId', async (req, res) => {
   } catch (error) {
     res.status(404).json({ error: { message: 'No product found', error: error.message } });
   }
-});
+};
 
-router.delete('/:productId', async (req, res) => {
+exports.deleteProduct = async (req, res) => {
   try {
     const id = req.params.productId;
     const deletedItem = await Product.findByIdAndDelete(id);
@@ -77,9 +53,9 @@ router.delete('/:productId', async (req, res) => {
   } catch (error) {
     res.status(400).json({ error: { message: 'Error deleting product', error: error.message } });
   }
-});
+};
 
-router.put('/:productId', async (req, res) => {
+exports.editProduct = async (req, res) => {
   try {
     const id = req.params.productId;
     const { name, price } = req.body;
@@ -93,6 +69,4 @@ router.put('/:productId', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: { message: 'Error editing product', error: error.message } });
   }
-});
-
-module.exports = router;
+};
